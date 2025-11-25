@@ -167,6 +167,9 @@ export class Parser {
       medias = medias.concat(this.getAudioLinks(prompt));
       prompt = this.parseLine(prompt, vault);
 
+      // Add filename to the front of the prompt
+      prompt = `${note}<br><br>${prompt}`;
+
       const initialOffset = match.index;
       const endingLine = match.index + match[0].length;
       const tags: string[] = this.parseTags(match[4], globalTags);
