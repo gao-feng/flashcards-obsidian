@@ -337,6 +337,9 @@ export class Parser {
       question = this.parseLine(question, vault);
       answer = this.parseLine(answer, vault);
 
+      // Add filename to the front of the question
+      question = `${note}<br><br>${question}`;
+
       const initialOffset = match.index
       const endingLine = match.index + match[0].length;
       const tags: string[] = this.parseTags(match[5], globalTags);
@@ -408,6 +411,9 @@ export class Parser {
 
       question = this.parseLine(question, vault);
       answer = this.parseLine(answer, vault);
+
+      // Add filename to the front of the question
+      question = `${note}<br><br>${question}`;
 
       const initialOffset = match.index
       const endingLine = match.index + match[0].length;
