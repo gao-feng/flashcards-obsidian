@@ -66,3 +66,10 @@ Contributions via bug reports, bug fixes, are welcome. If you have ideas about f
 ## Support
 If flashcards plugin is useful to you and you want to support me, you can thank me with a coffee :)
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V0ABKAF)
+
+## Build
+```
+npm install
+npm run build
+cp main.js manifest.json .obsidian/plugins/flashcards-obsidian/
+```
