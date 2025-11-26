@@ -428,7 +428,8 @@ export class Parser {
         fields["Source"] = note;
       }
       const containsCode = this.containsCode([question, answer]);
-
+      console.info("Flashcard: match")
+      console.info(match)
       const card = new Flashcard(
         id,
         deck,
