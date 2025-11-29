@@ -81,10 +81,9 @@ export class Regex {
     this.cardsInlineStyle = new RegExp(str, flags);
 
     // https://regex101.com/r/HOXF5E/1
+    // Changed from #card-spaced to #cardstart ... #cardend
     str =
-      "( {0,3}[#]*)((?:[^\\n]\\n?)+?)(#" +
-      settings.flashcardsTag +
-      "[/-]spaced)((?: *#[\\p{Letter}-]+)*) *\\n?(?:\\^(\\d{13}))?";
+      "(#cardstart)((?: *#[\\p{Number}\\p{Letter}\\-\\/_]+)*) *?\\n+((?:[\\s\\S]*?)*?)(#cardend) *(?:\\n|\\s)?(?:\\^(\\d{13}))?";
     this.cardsSpacedStyle = new RegExp(str, flags);
 
     // https://regex101.com/r/cgtnLf/1

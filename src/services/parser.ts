@@ -156,13 +156,16 @@ export class Parser {
       const context = contextAware
         ? this.getContext(headings, match.index - 1, headingLevel)
         : "";
+      console.info("Flashcard: generateSpacedCards match")
+      console.info(match)
 
-      const originalPrompt = match[2].trim();
+      const originalPrompt = match[3].trim();
       let prompt = contextAware
-        ? [...context, match[2].trim()].join(
+        ? [...context, match[3].trim()].join(
           `${this.settings.contextSeparator}`
         )
-        : match[2].trim();
+        : match[3].trim();
+
       let medias: string[] = this.getImageLinks(prompt);
       medias = medias.concat(this.getAudioLinks(prompt));
       prompt = this.parseLine(prompt, vault);

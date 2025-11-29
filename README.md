@@ -13,7 +13,7 @@ Anki integration for [Obsidian](https://obsidian.md/).
 
 🗃️ Simple flashcards with **#card**  
 🎴 Reversed flashcards with **#card-reverse** or **#card/reverse**  
-📅 Spaced-only cards with **#card-spaced** or **#card/spaced**  
+📅 Spaced cards with **#cardstart** and **#cardend**
 ✍️ Inline style with **Question::Answer**  
 ✍️ Inline style reversed with **Question:::Answer**  
 📃 Cloze with **==Highlight==** or **{Curly brackets}** or  **{2:Cloze}**   
