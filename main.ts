@@ -48,6 +48,15 @@ export default class ObsidianFlashcard extends Plugin {
 		this.registerInterval(window.setInterval(() =>
 			anki.ping().then(() => statusBar.setText('Anki ⚡️')).catch(() => statusBar.setText('')), 15 * 1000
 		));
+
+		// Listen for file rename events
+		this.registerEvent(
+			this.app.vault.on('rename', (file, oldPath) => {
+				if (file instanceof TFile && file.extension === 'md') {
+					this.handleFileRename(file, oldPath);
+				}
+			})
+		);
 	}
 
 	async onunload() {
@@ -67,5 +76,13 @@ export default class ObsidianFlashcard extends Plugin {
 		}).catch(err => {
 			Error(err)
 		})
+	}
+
+	private async handleFileRename(file: TFile, oldPath: string) {
+		try {
+			await this.cardsService.updateCardsSourceAfterRename(file, oldPath);
+		} catch (err) {
+			console.error('Failed to update cards source after rename:', err);
+		}
 	}
 }

@@ -392,7 +392,7 @@ export class CardsService {
         let ankiCard = undefined;
         if (flashcard.inserted) {
           ankiCard = ankiCards.filter(
-            (card: any) => Number(card.noteId) === flashcard.id
+            (card: unknown) => Number(card.noteId) === flashcard.id
           )[0];
           if (ankiCard) {
             ids = ids.concat(ankiCard.cards);
@@ -423,5 +423,91 @@ export class CardsService {
     }
 
     return [];
+  }
+
+  public async updateCardsSourceAfterRename(
+    file: TFile,
+    oldPath: string
+  ): Promise<void> {
+    try {
+      await this.anki.ping();
+    } catch (err) {
+      console.error("Anki is not running, skipping source update");
+      return;
+    }
+
+    const fileContent = await this.app.vault.read(file);
+    const ankiBlocks = this.parser.getAnkiIDsBlocks(fileContent);
+
+    if (!ankiBlocks || ankiBlocks.length === 0) {
+      return;
+    }
+
+    const cardIds = this.getAnkiIDs(ankiBlocks);
+    const ankiCards = await this.anki.getCards(cardIds);
+
+    if (!ankiCards || ankiCards.length === 0) {
+      return;
+    }
+
+    const vaultName = this.app.vault.getName();
+    const oldBasename = oldPath.replace(/\.md$/, '').split('/').pop();
+    const newBasename = file.basename;
+
+    // Generate the old and new source links
+    const oldSource = this.generateSourceLink(oldBasename, vaultName);
+    const newSource = this.generateSourceLink(newBasename, vaultName);
+
+    const updateActions: unknown[] = [];
+
+    for (const ankiCard of ankiCards) {
+      const fieldsToUpdate: Record<string, string> = {};
+      let hasUpdates = false;
+
+      // Update Source field if sourceSupport is enabled
+      if (this.settings.sourceSupport) {
+        const sourceField = ankiCard.fields?.Source?.value;
+        if (sourceField && sourceField.includes(oldSource)) {
+          fieldsToUpdate.Source = sourceField.replace(oldSource, newSource);
+          hasUpdates = true;
+        }
+      }
+
+      // Update content fields that contain the old filename
+      // Check Front, Back, Prompt fields for the old note reference
+      const oldNotePrefix = `${oldSource}<br><br>`;
+      const newNotePrefix = `${newSource}<br><br>`;
+
+      for (const fieldName of ['Front', 'Back', 'Prompt']) {
+        const field = ankiCard.fields?.[fieldName]?.value;
+        if (field && field.includes(oldNotePrefix)) {
+          fieldsToUpdate[fieldName] = field.replace(oldNotePrefix, newNotePrefix);
+          hasUpdates = true;
+        }
+      }
+
+      if (hasUpdates) {
+        updateActions.push({
+          action: "updateNoteFields",
+          params: {
+            note: {
+              id: ankiCard.noteId,
+              fields: fieldsToUpdate
+            }
+          }
+        });
+      }
+    }
+
+    if (updateActions.length > 0) {
+      await this.anki.invoke("multi", 6, { actions: updateActions });
+      console.log(`Updated ${updateActions.length} cards after file rename from "${oldBasename}" to "${newBasename}"`);
+    }
+  }
+
+  private generateSourceLink(basename: string, vaultName: string): string {
+    const encodedVault = encodeURIComponent(vaultName);
+    const encodedFile = encodeURIComponent(basename);
+    return `<a href="obsidian://open?vault=${encodedVault}&file=${encodedFile}.md">${basename}</a>`;
   }
 }
