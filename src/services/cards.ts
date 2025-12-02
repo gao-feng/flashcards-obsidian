@@ -55,11 +55,14 @@ export class CardsService {
     const vaultName = this.app.vault.getName();
     let globalTags: string[] = undefined;
 
+    console.info("fileCachedMetadata")
+    console.info(fileCachedMetadata)
     // Parse frontmatter
     const frontmatter = fileCachedMetadata.frontmatter;
     let deckName = "";
     if (parseFrontMatterEntry(frontmatter, "cards-deck")) {
       deckName = parseFrontMatterEntry(frontmatter, "cards-deck");
+      frontmatter.position = fileCachedMetadata.frontmatterPosition;
     } else if (this.settings.folderBasedDeck && activeFile.parent.path !== "/") {
       // If the current file is in the path "programming/java/strings.md" then the deck name is "programming::java"
       deckName = activeFile.parent.path.split("/").join("::");
@@ -112,6 +115,8 @@ export class CardsService {
         }
       }
       console.info(cardsNotInAnki);
+      console.info("frontmatter")
+      console.info(frontmatter)
 
       this.insertMedias(cards, sourcePath);
       await this.deleteCardsOnAnki(cardsToDelete, ankiBlocks);
