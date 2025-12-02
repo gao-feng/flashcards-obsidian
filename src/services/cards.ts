@@ -229,7 +229,7 @@ export class CardsService {
   private updateFrontmatter(frontmatter: FrontMatterCache, deckName: string) {
     let newFrontmatter = "";
     const cardsDeckLine = `cards-deck: ${deckName}\n`;
-    if (frontmatter) {
+    if (frontmatter && frontmatter.position) {
       const oldFrontmatter: string = this.file.substring(
         frontmatter.position.start.offset,
         frontmatter.position.end.offset
@@ -392,7 +392,7 @@ export class CardsService {
         let ankiCard = undefined;
         if (flashcard.inserted) {
           ankiCard = ankiCards.filter(
-            (card: unknown) => Number(card.noteId) === flashcard.id
+            (card: any) => Number(card.noteId) === flashcard.id
           )[0];
           if (ankiCard) {
             ids = ids.concat(ankiCard.cards);
